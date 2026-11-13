@@ -11,8 +11,10 @@ import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import { Briefcase, Calendar, MapPin } from "lucide-react"
 import { createJob } from "@/lib/actions/jobs"
+import { toast } from "@/components/ui/toast"
 
 type JobType = "full-time" | "part-time" | "contract" | "internship"
+export type JobStatus = "active" | "expired"
 
 // Flat form data, keys mirror the Figma layer names (isRemote, deadline, minSalary…).
 export type JobFormData = {
@@ -28,6 +30,8 @@ export type JobFormData = {
     salaryFrequency: string
     responsibilities: string
     requirements: string
+    applicants: number
+    status: JobStatus
 }
 
 const JOB_CATEGORIES = [
@@ -66,6 +70,8 @@ export default function NewJobPage() {
         salaryFrequency: "per hour",
         responsibilities: "",
         requirements: "",
+        applicants: 0,
+        status: "active"
     })
 
     // Generic flat setter so every field is just setField("key")(value).
@@ -81,8 +87,13 @@ export default function NewJobPage() {
         // TODO: wire into the backend (`POST /jobs` or similar).
 
         const result = await createJob(jobData);
-        console.log("createJob result:", result);
-
+        if(result.insertId) {
+            console.log("createJob result:", result);
+            toast.add({
+                title: "Job created",
+                description: "The job has been permanently deleted.",
+            })
+        }
     }
 
     return (
